@@ -224,11 +224,11 @@ Future<int> editPlace(Place newPlace) async {
       },
     ));
 
-    Response response = await dio.put('$baseUrl/place'+newPlace.id, data: newPlace.toJson());
+    Response response = await dio.put('$baseUrl/place/'+newPlace.id, data: newPlace.toJson());
     statusCode = response.statusCode;
-    if (statusCode == 201) {
+    if (statusCode == 200) {
       // Place created successfully
-      return 201;
+      return 200;
     } else if (statusCode == 400) {
       // Bad request, missing fields, etc.
       return 400;

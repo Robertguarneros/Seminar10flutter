@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seminario/Models/PlaceModel.dart';
 import 'package:flutter_seminario/Services/UserService.dart';
 import 'package:flutter_seminario/Widgets/button_sign_in.dart';
 import 'package:flutter_seminario/Widgets/paramTextBox.dart';
 import 'package:flutter_seminario/Screens/home_page.dart';
+import 'package:flutter_seminario/Models/PlaceModel.dart';
 import 'package:get/get.dart';
 
 late UserService userService;
 
-class CreatePlaceScreen extends StatefulWidget {
-  CreatePlaceScreen({Key? key}) : super(key: key);
-
+class EditPlaceScreen extends StatefulWidget {
   @override
-  _CreatePlaceScreenState createState() => _CreatePlaceScreenState();
+  _EditPlaceScreenState createState() => _EditPlaceScreenState();
 }
 
-class _CreatePlaceScreenState extends State<CreatePlaceScreen> {
-  final CreatePlaceScreenController controller =
-      Get.put(CreatePlaceScreenController());
+class _EditPlaceScreenState extends State<EditPlaceScreen> {
+  final EditPlaceScreenController controller =
+      Get.put(EditPlaceScreenController());
 
   @override
   void initState() {
     super.initState();
-    userService = UserService();
+    userService = UserService(); // Initialize userService here
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Place'),
+        title: const Text('Edit Place'), // Change app bar title to reflect editing
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -37,11 +35,16 @@ class _CreatePlaceScreenState extends State<CreatePlaceScreen> {
             children: [
               const SizedBox(height: 50),
               const Text(
-                'Create Place',
+                'Edit Place', // Update text to reflect editing
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 50,
                 ),
+              ),
+              const SizedBox(height: 40),
+              ParamTextBox(
+                controller: controller.idController,
+                text: 'Id',
               ),
               const SizedBox(height: 40),
               ParamTextBox(
@@ -77,8 +80,8 @@ class _CreatePlaceScreenState extends State<CreatePlaceScreen> {
               
               const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () => controller.createPlace(),
-                child: Text('Create Place'),
+                onPressed: () => controller.editPlace(),
+                child: Text('Edit Place'), // Change button text to reflect editing
               ),
               const SizedBox(height: 40),
             ],
@@ -89,7 +92,8 @@ class _CreatePlaceScreenState extends State<CreatePlaceScreen> {
   }
 }
 
-class CreatePlaceScreenController extends GetxController {
+class EditPlaceScreenController extends GetxController {
+  final TextEditingController idController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final TextEditingController photoController = TextEditingController();
@@ -97,56 +101,51 @@ class CreatePlaceScreenController extends GetxController {
   final TextEditingController ratingController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
 
-  void createPlace() {
-    if (titleController.text.isEmpty ||
-        contentController.text.isEmpty ||
-        photoController.text.isEmpty ||
-        authorController.text.isEmpty ||
-        ratingController.text.isEmpty ||
-        addressController.text.isEmpty) {
+  void editPlace() {
+    if (idController.text.isEmpty ) {
       Get.snackbar(
         'Error',
-        'Empty fields',
+        'Empty ID',
         snackPosition: SnackPosition.BOTTOM,
       );
     } else {
-      Place newPlace = Place(
-        id: '',
+      Place editedPlace = Place(
+        id: idController.text,
         title: titleController.text,
         content: contentController.text,
         photo: photoController.text,
         author: authorController.text,
-        rating: int.parse(ratingController.text),
+        rating: int.tryParse(ratingController.text) ?? 0,
         address: addressController.text,
         place_deactivated: false,
         creation_date: DateTime.now().toString(),
         modified_date: DateTime.now().toString(),
       );
 
-      userService.createPlace(newPlace).then((statusCode) {
-        if (statusCode == 201) {
-          print('Place created successfully');
+      userService.editPlace(editedPlace).then((statusCode) {
+        if (statusCode == 200) {
+          print('Place edited successfully');
           Get.snackbar(
             'Success!',
-            'Place created successfully',
+            'Place edited successfully',
             snackPosition: SnackPosition.BOTTOM,
           );
           Get.to(() => HomePage());
         } else {
-          print('Error creating place');
+          print('Error editing place');
           Get.snackbar(
             'Error',
-            'Failed to create place',
+            'Failed to edit place',
             snackPosition: SnackPosition.BOTTOM,
           );
         }
       }).catchError((error) {
         Get.snackbar(
           'Error',
-          'Failed to create place: $error',
+          'Failed to edit place: $error',
           snackPosition: SnackPosition.BOTTOM,
         );
-        print('Error creating place: $error');
+        print('Error editing place: $error');
       });
     }
   }
