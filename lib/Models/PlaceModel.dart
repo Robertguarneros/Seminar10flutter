@@ -1,4 +1,5 @@
 class Place {
+  final String id;
   final String title;
   final String content;
   final String photo;
@@ -10,6 +11,7 @@ class Place {
   final String modified_date;
 
   Place({
+    required this.id,
     required this.title,
     required this.content,
     required this.photo,
@@ -24,6 +26,7 @@ class Place {
   // Convert Place object to a Map<String, dynamic> for JSON encoding
   Map<String, dynamic> toJson() {
     return {
+      '_id': id,
       'title': title,
       'content': content,
       'photo': photo,
@@ -39,6 +42,7 @@ class Place {
   // Factory constructor to create a Place object from a JSON map
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(
+      id: json['_id'],
       title: json['title'],
       content: json['content'],
       photo: json['photo'],

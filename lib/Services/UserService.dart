@@ -211,4 +211,39 @@ class UserService {
   }
 }
 
+Future<int> editPlace(Place newPlace) async {
+  try {
+    // Interceptor to add token to the headers
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = getToken();
+        if (token != null) {
+          options.headers['x-access-token'] = token;
+        }
+        return handler.next(options);
+      },
+    ));
+
+    Response response = await dio.put('$baseUrl/place'+newPlace.id, data: newPlace.toJson());
+    statusCode = response.statusCode;
+    if (statusCode == 201) {
+      // Place created successfully
+      return 201;
+    } else if (statusCode == 400) {
+      // Bad request, missing fields, etc.
+      return 400;
+    } else if (statusCode == 500) {
+      // Internal server error
+      return 500;
+    } else {
+      // Other unhandled cases
+      return -1;
+    }
+  } catch (e) {
+    // Handle any errors that occur during the request
+    print('Error creating place: $e');
+    return -1; // Return -1 for generic error
+  }
+}
+
 }

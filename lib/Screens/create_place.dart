@@ -110,6 +110,7 @@ class CreatePlaceScreenController extends GetxController {
       );
     } else {
       Place newPlace = Place(
+        id: '',
         title: titleController.text,
         content: contentController.text,
         photo: photoController.text,
